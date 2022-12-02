@@ -1,10 +1,13 @@
 import React from "react"
 import { Container, Table, Button } from 'react-bootstrap'
+import Nav from '../component/navs'
 
 const fontcolor = "#BD0707"
 
 export default function Admin() {
     return (
+        <>
+        <Nav/>
         <Container className="p-5 mx-auto" style={{ color: fontcolor }}>
             <Table responsive bordered>
                 <thead>
@@ -36,6 +39,8 @@ export default function Admin() {
                 </tbody>
             </Table>
         </Container>
+        </>
+        
     )
 }
 

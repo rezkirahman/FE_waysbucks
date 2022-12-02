@@ -1,11 +1,38 @@
-import React from "react"
+import { React, useState } from "react"
 import { Container, Form, Button, FloatingLabel } from 'react-bootstrap'
+import { useNavigate } from "react-router-dom"
 import Productpic from '../assets/image/palmsugar.png'
 
 const fontcolor = "#BD0707"
 const cardcolor = "#F7DADA"
 
 export default function AddProduct() {
+    const navigate = useNavigate()
+    const [preview, setPreview] = useState(null)
+    const [productPic, setProductPic] = useState(<p>Photo Product</p>)
+
+    const [form, setForm] = useState({
+        name: '',
+        price: '',
+        image: '',
+        qty: '1',
+    });
+
+    const handleChange = (e) => {
+        setForm({
+            [e.target.name]: e.target.type === 'file' ? e.target.files : e.target.value,
+        });
+
+        //PREVIEW IMAGE
+        if (e.target.type === 'file') {
+            let url = URL.createObjectURL(e.target.files[0]);
+            setPreview(url);
+            setProductPic(<p className="txt-black">{url}</p>)
+        }
+    }
+
+
+
     return (
         <Container className="p-5 mx-auto" style={{ color: fontcolor }}>
             <div>

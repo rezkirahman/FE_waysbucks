@@ -1,11 +1,10 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { API, setAuthToken } from "./config/api";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { UserContext } from "./context/UserContext";
 
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import Navs from './page/navs';
 import Home from './page/home'
 import Detail from './page/detail-product';
 import Profile from './page/profile'
@@ -15,23 +14,32 @@ import Addproduct from './page/add-product'
 import Addtopping from './page/add-topping'
 
 
+// Init token on axios every time the app is refreshed
+// if (localStorage.token) {
+//   setAuthToken(localStorage.token)
+// }
+
 function App() {
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   // Init user context 
   const [state, dispatch] = useContext(UserContext);
 
-  useEffect(() => {
-    // Redirect Auth
-    if (state.isLogin === false) {
+  // Redirect Auth
+  React.useEffect(() => {
+    if (localStorage === false) {
       navigate('/');
     } else {
-      if (state.user.status === 'admin') {
+      if (state.user.role === 'admin') {
         navigate('/transaction');
-      } else if (state.user.status === 'customer') {
-        navigate('/');
+      } else {
+        //navigate('/');
       }
+    }
+        // Init token on axios
+    if (localStorage.token) {
+      setAuthToken(localStorage.token)
     }
   }, [state]);
 
@@ -40,7 +48,7 @@ function App() {
       const response = await API.get('/check-auth');
 
       // If the token incorrect
-      if (response.status === 404) {
+      if (response.role === 404) {
         return dispatch({
           type: 'AUTH_ERROR',
         });
@@ -61,26 +69,25 @@ function App() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     checkUser();
   }, []);
 
   return (
     <>
-      <Navs />
-      <body style={{ backgroundColor: '#FFFBFB' }}>
-        <Routes>
-          <Route exact path='/' element={<Home />} />
-          <Route exact path='/detail/:id' element={<Detail />} />
-          <Route exact path='/profile' element={<Profile />} />
-          <Route exact path='/cart' element={<Cart />} />
-          {/* ADMIN PAGE */}
-          <Route exact path='/add-product' element={<Addproduct />} />
-          <Route exact path='/add-topping' element={<Addtopping />} />
-          <Route exact path='/transaction' element={<Admin />} />
 
-        </Routes>
-      </body>
+      <Routes>
+        <Route exact path='/' element={<Home />} />
+        <Route exact path='/detail/:id' element={<Detail />} />
+        <Route exact path='/profile' element={<Profile />} />
+        <Route exact path='/cart' element={<Cart />} />
+        {/* ADMIN PAGE */}
+        <Route exact path='/add-product' element={<Addproduct />} />
+        <Route exact path='/add-topping' element={<Addtopping />} />
+        <Route exact path='/transaction' element={<Admin />} />
+
+      </Routes>
+
     </>
   );
 }

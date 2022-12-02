@@ -4,7 +4,7 @@ import Herobg from '../assets/image/hero.png'
 
 export default function Hero() {
     return (
-        <Container className='px-5 justify-content-between mt-3' >
+        <Container className='px-5 mt-3'>
             <div>
                 <div className='position-relative'>
                     <img className='img-fluid' src={Herobg} alt='hero' />

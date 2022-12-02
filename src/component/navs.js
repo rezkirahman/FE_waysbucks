@@ -1,31 +1,65 @@
-import React, { useState, useRef } from 'react'
-import { Container, Nav, Navbar, Button, Popover, Overlay } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
-import Login from './login'
-import Register from './register'
+import React, { useState, useRef, useContext, useEffect } from 'react'
+import { API } from '../config/api';
+import { UserContext } from '../context/UserContext';
+import { Container, Nav, Navbar, Popover, Overlay } from 'react-bootstrap'
+import { useNavigate, Link } from 'react-router-dom'
 import Logo from '../assets/image/logo.png'
-import { Link, } from 'react-router-dom'
 import Photouser from '../assets/image/profilephoto.png'
 import Iconcart from '../assets/image/icon-cart.png'
 import Iconaddproduct from '../assets/image/icon-addproduct.png'
 import Iconaddtopping from '../assets/image/icon-addtopping.png'
 import Iconlogout from '../assets/image/icon-logout.png'
+import ModalLoginRegister from './auth'
+
+//const DataUser = JSON.parse(localStorage.getItem("VALUE_LOGIN"))
 
 
-const DataUser = JSON.parse(localStorage.getItem("VALUE_LOGIN"))
+export default function Navs({ show, setShow }) {
+  let redirect = null
+  const [state, dispatch] = useContext(UserContext);
 
-let redirect = null
+  //console.log(state)
+  const checkUser = async () => {
+    try {
+      const response = await API.get('/check-auth');
 
-export default function Navs() {
-  if (DataUser !== null) {
-    if (DataUser[0].role === "admin") {
-      redirect="/admin"
+      // If the token incorrect
+      if (response.role === 404) {
+        return dispatch({
+          type: 'AUTH_ERROR',
+        });
+      }
+
+      // Get user data
+      let payload = response.data.data;
+      // Get token from local storage
+      payload.token = localStorage.token;
+
+      // Send data to useContext
+      dispatch({
+        type: 'USER_SUCCESS',
+        payload,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+
+  if (state.islogin === true) {
+    if (state.user.role === "admin") {
+      redirect = "/transaction"
     } else {
-      redirect="/"
+      redirect = "/"
     }
   } else {
-    redirect="/"
+    redirect = "/"
   }
+
   return (
     <>
       <Navbar bg="light" expand="lg">
@@ -37,10 +71,16 @@ export default function Navs() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav" className='justify-content-end'>
-            {DataUser !== null ?
-              DataUser[0].role === "admin" ?
+            {state.isLogin === true ?
+              state.user.role === "admin" ?
                 <Adminpanel /> : <Userpanel />
-              : <LoginRegister />}
+              :
+              <Nav>
+                <Nav.Link>
+                  <ModalLoginRegister show={show} setShow={setShow} />
+                </Nav.Link>
+              </Nav>
+            }
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -48,37 +88,9 @@ export default function Navs() {
   )
 }
 
-function LoginRegister() {
-  const [showLogin, setShowLogin] = useState(false)
-  const [showRegister, setShowReg] = useState(false)
-
-  return (
-    <Nav>
-      <Nav.Link>
-        <Button variant='danger' onClick={() => setShowLogin(true)}>Login</Button>
-      </Nav.Link >
-      <Nav.Link>
-        <Button variant='outline-danger' onClick={() => setShowReg(true)}>Sign Up</Button>
-
-        <Login
-          show={showLogin}
-          onHide={() => setShowLogin(false)}
-          setShowLogin={setShowLogin}
-          setShowRegister={setShowReg}
-        />
-
-        <Register
-          show={showRegister}
-          onHide={() => setShowReg(false)}
-          setShowLogin={setShowLogin}
-          setShowRegister={setShowReg}
-        />
-      </Nav.Link>
-    </Nav >
-  )
-}
 
 function Userpanel() {
+  const [state, dispatch] = useContext(UserContext);
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState(null);
   const ref = useRef(null);
@@ -89,10 +101,11 @@ function Userpanel() {
     setTarget(event.target);
   }
 
-  const LogOut = () => {
-    navigate("/")
-    localStorage.removeItem("VALUE_LOGIN")
-    window.location.reload()
+  const logOut = () => {
+    dispatch({
+      type: 'LOGOUT',
+    })
+    navigate("/");
   }
   return (
     <Nav>
@@ -130,7 +143,7 @@ function Userpanel() {
           <hr />
           <Popover.Body>
             <div>
-              <Link onClick={LogOut} style={{ textDecoration: "none" }}>
+              <Link onClick={logOut} style={{ textDecoration: "none" }}>
                 <img src={Iconlogout} width={30} alt="logout" />
                 <text className='fw-bold mx-3 text-dark'>Log Out</text>
               </Link>
@@ -144,6 +157,7 @@ function Userpanel() {
 }
 
 function Adminpanel() {
+  const [state, dispatch] = useContext(UserContext);
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState(null);
   const ref = useRef(null);
@@ -154,10 +168,11 @@ function Adminpanel() {
     setTarget(event.target);
   }
 
-  const LogOut = () => {
-    navigate("/")
-    localStorage.removeItem("VALUE_LOGIN")
-    window.location.reload()
+  const logOut = () => {
+    dispatch({
+      type: 'LOGOUT',
+    })
+    navigate("/");
   }
 
   return (
@@ -197,7 +212,7 @@ function Adminpanel() {
           <hr />
           <Popover.Body>
             <div>
-              <Link onClick={LogOut} style={{ textDecoration: "none" }}>
+              <Link onClick={logOut} style={{ textDecoration: "none" }}>
                 <img src={Iconlogout} width={30} alt="logout" />
                 <text className='fw-bold mx-3 text-dark'>Log Out</text>
               </Link>
