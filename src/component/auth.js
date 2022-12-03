@@ -4,7 +4,8 @@ import { Button, Modal, Form, Alert } from "react-bootstrap";
 import { UserContext } from "../context/UserContext";
 import { useMutation } from "react-query";
 import { API } from '../config/api';
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { setAuthToken } from "../config/api";
 
 export default function ModalLoginRegister({ show, setShow }) {
     // modal-check
@@ -13,6 +14,7 @@ export default function ModalLoginRegister({ show, setShow }) {
     const [shows, setShows] = useState(false);
     const handleShowRegister = () => setShows(true);
     const handleCloseRegister = () => setShows(false);
+    const navigate = useNavigate()
 
     const handleSwitchRegister = () => {
         setShow(false);
@@ -61,6 +63,7 @@ export default function ModalLoginRegister({ show, setShow }) {
             console.log(state)
             console.log(response.data.data)
             setShow(false);
+            
         } catch (error) {
             const alert = (
                 <Alert variant="danger" className="py-1">

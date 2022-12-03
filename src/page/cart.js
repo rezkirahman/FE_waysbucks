@@ -1,8 +1,10 @@
-import React from "react"
+import { React, useState } from "react"
 import { Container, Form, Button, FloatingLabel } from 'react-bootstrap'
 import Palmsugar from '../assets/image/palmsugar.png'
 import Bin from '../assets/image/bin.png'
 import Invoice from '../assets/image/icon-invoice.png'
+import { useNavigate } from "react-router-dom"
+import { useQuery } from "react-query"
 
 const fontcolor = "#BD0707"
 const cardcolor = "#F7DADA"
@@ -10,6 +12,14 @@ const fontcolor2 = "#613D2B"
 
 
 export default function Cart() {
+
+    let navigate = useNavigate()
+    const [popUp] = useState(false)
+
+    let { data: order, refetch } = useQuery("orderCache", async () => {
+
+    })
+
     return (
         <Container className="p-5 mx-auto" style={{ color: fontcolor }}>
             <div>
@@ -86,12 +96,12 @@ function OrderPrice() {
                 </div>
             </div>
             <div className="col-6 col-md-4">
-                <Container className="rounded-2 py-4 my-3" style={{ backgroundColor: cardcolor, borderStyle:"solid", borderColor:fontcolor}}>
+                <Container className="rounded-2 py-4 my-3" style={{ backgroundColor: cardcolor, borderStyle: "solid", borderColor: fontcolor }}>
                     <div align="center" className="mb-3">
-                        <img src={Invoice} alt="invoice" width={50}/>
+                        <img src={Invoice} alt="invoice" width={50} />
                     </div>
                     <div align="center">
-                        <text style={{ fontSize: "18px", opacity:"0.4"}}>Attache of Transaction</text>
+                        <text style={{ fontSize: "18px", opacity: "0.4" }}>Attache of Transaction</text>
                     </div>
                 </Container>
             </div>
@@ -151,7 +161,7 @@ function PaymentForm() {
 
 
             <div className="d-grid gap-2">
-                <Button variant="danger" style={{background:fontcolor}}>Pay</Button>
+                <Button variant="danger" style={{ background: fontcolor }}>Pay</Button>
             </div>
         </Form>
     )

@@ -1,7 +1,6 @@
-import React from 'react'
+import { React, useEffect, useContext } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { API, setAuthToken } from "./config/api";
-import { useContext } from "react";
 import { UserContext } from "./context/UserContext";
 
 import { Route, Routes, useNavigate } from 'react-router-dom';
@@ -14,41 +13,39 @@ import Addproduct from './page/add-product'
 import Addtopping from './page/add-topping'
 
 
-// Init token on axios every time the app is refreshed
-// if (localStorage.token) {
-//   setAuthToken(localStorage.token)
-// }
+//Init token on axios every time the app is refreshed
+if (localStorage.token) {
+  setAuthToken(localStorage.token)
+}
 
 function App() {
-
   const navigate = useNavigate();
 
   // Init user context 
   const [state, dispatch] = useContext(UserContext);
 
   // Redirect Auth
-  React.useEffect(() => {
-    if (localStorage === false) {
-      navigate('/');
+  useEffect(() => {
+    if (state.isLogin === false) {
+      navigate('/')
     } else {
-      if (state.user.role === 'admin') {
-        navigate('/transaction');
+      if (state.user.role === "admin") {
+        navigate('/transaction')
       } else {
-        //navigate('/');
+        navigate('/')
       }
     }
-        // Init token on axios
-    if (localStorage.token) {
-      setAuthToken(localStorage.token)
-    }
-  }, [state]);
+  }, [state.isLogin])
+
+
+
 
   const checkUser = async () => {
     try {
       const response = await API.get('/check-auth');
 
       // If the token incorrect
-      if (response.role === 404) {
+      if (response === 404) {
         return dispatch({
           type: 'AUTH_ERROR',
         });
@@ -69,7 +66,7 @@ function App() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     checkUser();
   }, []);
 

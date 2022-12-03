@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { useQuery } from "react-query";
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Jumbotron from '../component/hero'
 import { UserContext } from "../context/UserContext";
 import Nav from '../component/navs'
@@ -23,7 +23,7 @@ export default function Home() {
         navigate("/detail/" + id)
     }
 
-    let { data: products, refetch } = useQuery("productsCache", async () => {
+    let { data: products } = useQuery("productsCache", async () => {
         const response = await API.get("/products");
         return response.data.data;
     });
@@ -40,7 +40,7 @@ export default function Home() {
                     <div>
                         <p className='h3 font-weight-bold mt-5 fw-bold' style={{ color: fontcolor }}>Let's Order</p>
                     </div>
-                    <div className='row row-cols-auto'>
+                    <div className='row row-cols-auto justify-content-center'>
                         {products?.map((item, index) => (
                             <div
                                 onClick={state.isLogin === true ? () => toDetail(item?.id) : handleClick}

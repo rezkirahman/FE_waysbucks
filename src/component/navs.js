@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext, useEffect } from 'react'
 import { API } from '../config/api';
 import { UserContext } from '../context/UserContext';
-import { Container, Nav, Navbar, Popover, Overlay } from 'react-bootstrap'
+import { Container, Nav, Navbar, Popover, Overlay, Badge } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 import Logo from '../assets/image/logo.png'
 import Photouser from '../assets/image/profilephoto.png'
@@ -9,7 +9,8 @@ import Iconcart from '../assets/image/icon-cart.png'
 import Iconaddproduct from '../assets/image/icon-addproduct.png'
 import Iconaddtopping from '../assets/image/icon-addtopping.png'
 import Iconlogout from '../assets/image/icon-logout.png'
-import ModalLoginRegister from './auth'
+import Auth from './auth'
+import { useQuery } from 'react-query';
 
 //const DataUser = JSON.parse(localStorage.getItem("VALUE_LOGIN"))
 
@@ -50,7 +51,7 @@ export default function Navs({ show, setShow }) {
   }, []);
 
 
-  if (state.islogin === true) {
+  if (localStorage) {
     if (state.user.role === "admin") {
       redirect = "/transaction"
     } else {
@@ -71,13 +72,13 @@ export default function Navs({ show, setShow }) {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav" className='justify-content-end'>
-            {state.isLogin === true ?
+            {state.isLogin ?
               state.user.role === "admin" ?
                 <Adminpanel /> : <Userpanel />
               :
               <Nav>
                 <Nav.Link>
-                  <ModalLoginRegister show={show} setShow={setShow} />
+                  <Auth show={show} setShow={setShow} />
                 </Nav.Link>
               </Nav>
             }
@@ -90,11 +91,16 @@ export default function Navs({ show, setShow }) {
 
 
 function Userpanel() {
-  const [state, dispatch] = useContext(UserContext);
+  const [dispatch] = useContext(UserContext);
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState(null);
   const ref = useRef(null);
   let navigate = useNavigate()
+
+  const { data: order } = useQuery("ordersCache", async () => {
+    const response = await API.get('/orders');
+    return response.data.data;
+  });
 
   const handleClick = (event) => {
     setShow(!show);
@@ -104,14 +110,17 @@ function Userpanel() {
   const logOut = () => {
     dispatch({
       type: 'LOGOUT',
-    })
+    });
     navigate("/");
   }
+
   return (
     <Nav>
       <Nav.Link className=''>
-        <Link to='/cart'>
+        <Link to='/cart' className='position-relative'>
           <img src={Iconcart} alt='iconcart' width={30} />
+          <Badge className='bg-danger rounded-circle position-absolute top-0 start-50'>{order?.length}</Badge >
+
         </Link>
       </Nav.Link>
       <Nav.Link ref={ref}>
@@ -157,7 +166,7 @@ function Userpanel() {
 }
 
 function Adminpanel() {
-  const [state, dispatch] = useContext(UserContext);
+  const [dispatch] = useContext(UserContext);
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState(null);
   const ref = useRef(null);
@@ -169,9 +178,7 @@ function Adminpanel() {
   }
 
   const logOut = () => {
-    dispatch({
-      type: 'LOGOUT',
-    })
+    dispatch({ type: "LOGOUT" });
     navigate("/");
   }
 
@@ -216,7 +223,6 @@ function Adminpanel() {
                 <img src={Iconlogout} width={30} alt="logout" />
                 <text className='fw-bold mx-3 text-dark'>Log Out</text>
               </Link>
-
             </div>
           </Popover.Body>
         </Popover>

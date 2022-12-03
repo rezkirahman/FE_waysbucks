@@ -1,30 +1,41 @@
-import React from "react"
+import React, { useContext } from "react"
 import { Container } from 'react-bootstrap'
 import Photo from '../assets/image/profilephoto.png'
 import Logo from '../assets/image/logo.png'
 import Qrcode from '../assets/image/qr-code.png'
 import Palmsugar from '../assets/image/palmsugar.png'
+import { UserContext } from "../context/UserContext"
+import Nav from '../component/navs'
+// import { useNavigate } from "react-router-dom"
+// import { API } from "../config/api"
+// import { useQuery } from "react-query"
 
 const fontcolor = "#BD0707"
 const fontcolor2 = "#613D2B"
 const cardcolor = "#F7DADA"
 
 export default function Profile() {
+
     return (
-        <Container className='px-5 justify-content-between mt-5' >
-            <div className="row">
-                <div className="col">
-                    <MyProfile />
+        <>
+            <Nav />
+            <Container className='px-5 justify-content-between mt-5' >
+                <div className="row">
+                    <div className="col">
+                        <MyProfile />
+                    </div>
+                    <div className="col">
+                        <Transaction />
+                    </div>
                 </div>
-                <div className="col">
-                    <Transaction />
-                </div>
-            </div>
-        </Container>
+            </Container>
+        </>
     )
 }
 
 function MyProfile() {
+    const [state] = useContext(UserContext)
+
     return (
         <>
             <div style={{ color: fontcolor }}>
@@ -36,9 +47,9 @@ function MyProfile() {
                 </div>
                 <div className="">
                     <label className="fw-bold">Full Name</label>
-                    <p>siGanteng</p>
+                    <p>{state.user.name}</p>
                     <label className="fw-bold">Email</label>
-                    <p>blabla@gmail.com</p>
+                    <p>{state.user.email}</p>
                 </div>
             </div>
 
@@ -47,6 +58,12 @@ function MyProfile() {
 }
 
 function Transaction() {
+    // let { data: trans } = useQuery('transCache', async () => {
+    //     const respTrans = await API.get('/user-transaction');
+    //     console.log(respTrans)
+    //     return respTrans.data.data;
+    // });
+
     return (
         <>
             <div style={{ color: fontcolor2 }}>
@@ -54,7 +71,6 @@ function Transaction() {
             </div>
             <div className="d-flex justify-content-between p-4 rounded-3" style={{ backgroundColor: cardcolor }}>
                 <div>
-                    <TransactionProduct />
                     <TransactionProduct />
                 </div>
                 <div>
